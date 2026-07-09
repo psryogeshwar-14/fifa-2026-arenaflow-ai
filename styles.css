@@ -1,0 +1,132 @@
+/* Custom styles for ArenaFlow AI Command Center - Zinc Dark theme style */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+/* Main background overrides */
+.stApp {
+    background-color: #09090b !important;
+    color: #fafafa !important;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Sidebar Custom Styling */
+section[data-testid="stSidebar"] {
+    background-color: #0c0c0f !important;
+    border-right: 1px solid #1e1e24 !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown {
+    color: #fafafa !important;
+}
+
+/* Card-Based Layout */
+div.metric-card {
+    background-color: #0c0c0f !important;
+    border: 1px solid #1e1e24 !important;
+    border-radius: 12px !important;
+    padding: 1.25rem !important;
+    margin-bottom: 1rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+div.metric-card:hover {
+    border-color: #3b82f6 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Text styles */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.025em !important;
+    color: #fafafa !important;
+}
+
+.muted-text {
+    color: #71717a !important;
+    font-size: 0.875rem !important;
+}
+
+.mono-text {
+    font-family: 'JetBrains Mono', monospace !important;
+    color: #3b82f6 !important;
+    background-color: #18181b !important;
+    padding: 0.1rem 0.3rem !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+}
+
+/* Glassmorphism details panel */
+.details-panel {
+    background: rgba(12, 12, 15, 0.75) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+}
+
+/* Custom buttons styling override */
+div.stButton > button {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+    width: 100% !important;
+}
+
+div.stButton > button:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Secondary Button style */
+div.secondary-btn > div.stButton > button {
+    background-color: #262626 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #3f3f46 !important;
+}
+
+div.secondary-btn > div.stButton > button:hover {
+    background-color: #3f3f46 !important;
+    color: #fafafa !important;
+}
+
+/* Alert styles */
+.alert-container {
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 1rem !important;
+    display: flex !important;
+    gap: 0.75rem !important;
+    border: 1px solid transparent !important;
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+.alert-error {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+}
+
+.alert-warning {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+}
+
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.2) !important;
+    color: #60a5fa !important;
+}
