@@ -138,7 +138,7 @@ def run_fan_hub(api_key: Optional[str] = None, ai_model: Optional[Any] = None) -
         with col1:
             st.markdown("##### Log an Action:")
             
-            action_type = st.selectbox(
+            st.selectbox(
                 "Choose your sustainability action:",
                 [
                     "♻️ Recycled plastic/aluminum at smart bin",

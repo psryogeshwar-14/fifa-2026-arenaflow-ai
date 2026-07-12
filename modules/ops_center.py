@@ -39,17 +39,6 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
 
     with tab1:
         st.subheader("👁️ Live Crowd Density & Predictions")
-        
-        # Sector status grid
-        sectors = [
-            {"name": "Gate C North Concourse", "density": 87, "status": "High (Bottleneck)", "color": "red"},
-            {"name": "Gate A East Entrance", "density": 45, "status": "Normal", "color": "green"},
-            {"name": "Section 108 Exit Corridor", "density": 72, "status": "Moderate", "color": "orange"},
-            {"name": "Transit Station Plaza", "density": 92, "status": "Critical", "color": "red"},
-            {"name": "West Concourse Food Court", "density": 64, "status": "Normal", "color": "green"},
-            {"name": "VIP Terrace Level", "density": 22, "status": "Low", "color": "green"}
-        ]
-
         # Draw metrics
         col_m1, col_m2, col_m3 = st.columns(3)
         with col_m1:
@@ -95,9 +84,9 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
         chart_data = pd.DataFrame({
             "Time": time_labels * 3,
             "Crowd Density (%)": np.concatenate([
-                [87, 89, 92, 85, 78, 65, 45], # Gate C North
-                [92, 94, 96, 91, 79, 58, 30], # Transit Plaza
-                [45, 52, 60, 68, 70, 72, 75]  # Gate A East
+                [87, 89, 92, 85, 78, 65, 45],  # Gate C North
+                [92, 94, 96, 91, 79, 58, 30],  # Transit Plaza
+                [45, 52, 60, 68, 70, 72, 75]   # Gate A East
             ]),
             "Sector": ["Gate C Concourse"] * 7 + ["Transit Station Plaza"] * 7 + ["Gate A Entrance"] * 7
         })
@@ -157,7 +146,7 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
                 if inc["status"] == "Active":
                     col_act1, col_act2 = st.columns(2)
                     with col_act1:
-                        if st.button(f"⚡ AI Dispatch & Assign", key=f"dispatch_{inc['id']}"):
+                        if st.button("⚡ AI Dispatch & Assign", key=f"dispatch_{inc['id']}"):
                             task_id = f"TSK-{random.randint(302, 399)}"
                             task_desc = f"GenAI Recommendation: Dispatch volunteers to {clean_sector} to handle {clean_desc}"
                             st.session_state.dispatched_tasks.append({
@@ -171,7 +160,7 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
                             st.success(f"Dispatched Task {task_id} successfully!")
                             st.rerun()
                     with col_act2:
-                        if st.button(f"✅ Resolve", key=f"resolve_{inc['id']}"):
+                        if st.button("✅ Resolve", key=f"resolve_{inc['id']}"):
                             inc["status"] = "Resolved"
                             st.rerun()
 

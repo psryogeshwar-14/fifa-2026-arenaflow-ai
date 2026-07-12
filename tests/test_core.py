@@ -1,7 +1,7 @@
 import sys
 from unittest.mock import MagicMock
 
-# --- STEP 1: MOCK STREAMLIT ---
+# --- STEP 1: MOCK STREAMLIT & DEPENDENCIES ---
 mock_st = MagicMock()
 sys.modules['streamlit'] = mock_st
 
@@ -22,6 +22,7 @@ class SessionStateMock(dict):
         except KeyError:
             raise AttributeError(f"'SessionStateMock' object has no attribute '{key}'")
 
+
 # Assign session state instance globally
 mock_session = SessionStateMock()
 mock_st.session_state = mock_session
@@ -30,9 +31,11 @@ mock_st.session_state = mock_session
 def mock_tabs(tab_list):
     return [MagicMock() for _ in tab_list]
 
+
 def mock_columns(col_spec):
     num_cols = col_spec if isinstance(col_spec, int) else len(col_spec)
     return [MagicMock() for _ in range(num_cols)]
+
 
 mock_st.tabs.side_effect = mock_tabs
 mock_st.columns.side_effect = mock_columns
@@ -50,18 +53,19 @@ mock_px = MagicMock()
 sys.modules['plotly.express'] = mock_px
 
 # --- STEP 2: IMPORT LOGIC & MODULES ---
-import unittest
-from modules.utils import (
+import unittest  # noqa: E402
+from modules.utils import (  # noqa: E402
     sanitize_input,
     get_routing_steps,
     get_waste_sorting_recommendation,
     get_broadcast_translation_fallback,
     get_fifa_manual_entry
 )
-from modules.fan_hub import run_fan_hub
-from modules.ops_center import run_ops_center
-from modules.sustainability import run_sustainability
-from modules.broadcast import run_broadcast
+from modules.fan_hub import run_fan_hub  # noqa: E402
+from modules.ops_center import run_ops_center  # noqa: E402
+from modules.sustainability import run_sustainability  # noqa: E402
+from modules.broadcast import run_broadcast  # noqa: E402
+
 
 class TestArenaFlowAI(unittest.TestCase):
     def setUp(self):
@@ -80,7 +84,10 @@ class TestArenaFlowAI(unittest.TestCase):
         self.mock_model.generate_content.assert_called_once_with(prompt)
 
     def test_sanitize_input(self):
-        self.assertEqual(sanitize_input("Hello <script>alert('XSS')</script> World"), "Hello alert(&#x27;XSS&#x27;) World")
+        self.assertEqual(
+            sanitize_input("Hello <script>alert('XSS')</script> World"), 
+            "Hello alert(&#x27;XSS&#x27;) World"
+        )
         self.assertEqual(sanitize_input("   Lead space strip   "), "Lead space strip")
         self.assertEqual(sanitize_input(None), "")
         self.assertEqual(sanitize_input("<b>Bold</b>"), "Bold")
@@ -126,6 +133,7 @@ class TestArenaFlowAI(unittest.TestCase):
         mock_session["jumbotron_lang"] = "Spanish"
         run_broadcast("MOCK_KEY", self.mock_model)
         self.assertTrue(mock_st.markdown.called)
+
 
 if __name__ == '__main__':
     unittest.main()

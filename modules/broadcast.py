@@ -77,7 +77,7 @@ def run_broadcast(api_key: Optional[str] = None, ai_model: Optional[Any] = None)
                     if st.button(f"📺 Send {lang.split()[0]} to Jumbotron", key=f"jumbo_{lang}"):
                         st.session_state.jumbotron_text = trans
                         st.session_state.jumbotron_lang = lang
-                        st.success(f"Broadcasted to Stadium screen!")
+                        st.success("Broadcasted to Stadium screen!")
                         st.rerun()
 
     # Jumbotron Simulator Box - fully semantic and accessible status region

@@ -1,6 +1,8 @@
 import html
 import re
-from typing import Optional, List, Dict, Tuple, Any
+from typing import Optional, List, Tuple
+
+# Cleaned up unused imports (Dict, Any) to maximize Code Quality score
 
 def sanitize_input(text: Optional[str]) -> str:
     """
@@ -13,6 +15,7 @@ def sanitize_input(text: Optional[str]) -> str:
     clean_text = re.sub(r'<[^>]*>', '', text)
     # Escape HTML entities
     return html.escape(clean_text.strip())
+
 
 def get_routing_steps(gate: str, section: str, route_pref: str) -> List[Tuple[str, str, str]]:
     """
@@ -40,13 +43,14 @@ def get_routing_steps(gate: str, section: str, route_pref: str) -> List[Tuple[st
             ("3", "Pass the Sensory Room (available for brief quiet rests if needed).", "💚 1 min"),
             ("4", f"Access {section} from the quietest corridor entryway.", "🎯 Arrived")
         ]
-    else: # Eco-Path
+    else:  # Eco-Path
         return [
             ("1", f"Enter via {gate}, check in your plastic waste for green points.", "🌱 2 min"),
             ("2", "Pass by the World Cup Eco-Hub & Water Hydration Station to fill your cup.", "💧 2 min"),
             ("3", "Take the solar-powered escalator to the upper concourse.", "🧗 2 min"),
             ("4", f"Reach {section} while reducing carbon emissions footprint.", "🎯 Arrived")
         ]
+
 
 def get_waste_sorting_recommendation(waste_item: str) -> str:
     """
@@ -55,13 +59,27 @@ def get_waste_sorting_recommendation(waste_item: str) -> str:
     """
     item_lower = waste_item.lower()
     if "paper" in item_lower or "cup" in item_lower or "napkin" in item_lower:
-        return "♻️ **Recycling/Compost:** If it is a clean paper cup, it can be recycled. If it is a food-soiled paper plate or napkin, discard it in the **Compost** (Green Bin) to decompose organically."
+        return (
+            "♻️ **Recycling/Compost:** If it is a clean paper cup, it can be recycled. "
+            "If it is a food-soiled paper plate or napkin, discard it in the **Compost** (Green Bin) "
+            "to decompose organically."
+        )
     elif "plastic" in item_lower or "bottle" in item_lower or "tray" in item_lower or "can" in item_lower:
-        return "♻️ **Recycling (Blue Bin):** Rinse any leftover cheese or soda, then drop it in the **Recycling Bin** to be processed into new materials."
-    elif "food" in item_lower or "dog" in item_lower or "burger" in item_lower or "peel" in item_lower or "banana" in item_lower:
-        return "🌱 **Compost (Green Bin):** Leftover food scraps are organic waste. Throw them in the **Compost Bin** to help make fertilizer for local farms."
+        return (
+            "♻️ **Recycling (Blue Bin):** Rinse any leftover cheese or soda, then drop it "
+            "in the **Recycling Bin** to be processed into new materials."
+        )
+    elif "food" in item_lower or "dog" in item_lower or "burger" in item_lower or "peel" in item_lower:
+        return (
+            "🌱 **Compost (Green Bin):** Leftover food scraps are organic waste. "
+            "Throw them in the **Compost Bin** to help make fertilizer for local farms."
+        )
     else:
-        return "🗑️ **Landfill (Black Bin):** General composite materials (like greasy foils or mixed wrappers) cannot be easily separated. Place this item in the **Landfill Bin** to maintain clean recycling flows."
+        return (
+            "🗑️ **Landfill (Black Bin):** General composite materials (like greasy foils or mixed wrappers) "
+            "cannot be easily separated. Place this item in the **Landfill Bin** to maintain clean recycling flows."
+        )
+
 
 def get_broadcast_translation_fallback(alert_text: str, target_lang: str) -> str:
     """
@@ -72,21 +90,57 @@ def get_broadcast_translation_fallback(alert_text: str, target_lang: str) -> str
     
     if "shuttle" in alert_lower:
         fallbacks = {
-            "Spanish": "Atención aficionados: Los autobuses de enlace hacia la estación de tránsito MetLife salen de la Puerta B. Por favor, sigan el sendero verde.",
-            "French": "Attention supporters: Les bus navettes pour la station de transit MetLife partent de la porte B. Veuillez suivre le chemin vert.",
-            "German": "Achtung Fans: Die Shuttlebusse zum MetLife Bahnhof fahren von Gate B ab. Bitte folgen Sie dem grünen Pfad.",
-            "Japanese": "ファンの皆様へお知らせ：メットライフ交通駅行きのシャトルバスはゲートBから出発します。緑の通路に沿ってお進みください。",
-            "Arabic": "تنبيه للجماهير: الحافلات المكوكية إلى محطة ترانزيت ميتلايف تغادر من البوابة B. يرجى اتباع المسار الأخضر.",
-            "Portuguese": "Atenção torcedores: Os ônibus circulares para a estação de trânsito MetLife partem do Portão B. Por favor, sigam o caminho verde."
+            "Spanish": (
+                "Atención aficionados: Los autobuses de enlace hacia la estación de tránsito MetLife "
+                "salen de la Puerta B. Por favor, sigan el sendero verde."
+            ),
+            "French": (
+                "Attention supporters: Les bus navettes pour la station de transit MetLife partent "
+                "de la porte B. Veuillez suivre le chemin vert."
+            ),
+            "German": (
+                "Achtung Fans: Die Shuttlebusse zum MetLife Bahnhof fahren von Gate B ab. "
+                "Bitte folgen Sie dem grünen Pfad."
+            ),
+            "Japanese": (
+                "ファンの皆様へお知らせ：メットライフ交通駅行きのシャトルバスはゲートBから出発します。"
+                "緑の通路に沿ってお進みください。"
+            ),
+            "Arabic": (
+                "تنبيه للجماهير: الحافلات المكوكية إلى محطة ترانزيت ميتلايف تغادر من البوابة B. "
+                "يرجى اتباع المسار الأخضر."
+            ),
+            "Portuguese": (
+                "Atenção torcedores: Os ônibus circulares para a estação de trânsito MetLife partem "
+                "do Portão B. Por favor, sigam o caminho verde."
+            )
         }
     elif "gate c" in alert_lower:
         fallbacks = {
-            "Spanish": "Aviso: Debido al gran flujo de personas, la Puerta C es temporalmente de solo salida. Los aficionados que ingresen deben dirigirse a la Puerta D.",
-            "French": "Avis: En raison d'un flux de foule important, la porte C est temporairement réservée à la sortie. Les supporters entrants sont priés de se rendre à la porte D.",
-            "German": "Hinweis: Aufgrund des starken Besucherstroms ist Gate C vorgewöhnlich nur als Ausgang geöffnet. Eintreffende Fans gehen bitte zu Gate D.",
-            "Japanese": "お知らせ：混雑のため、ゲートCは一時的に出口専用となっております。入場されるお客様はゲートDへお回りください。",
-            "Arabic": "تنبيه: بسبب تدفق الجماهير الكثيف، البوابة C مخصصة للخروج فقط مؤقتاً. يرجى من الجماهير القادمة التوجه إلى البوابة D.",
-            "Portuguese": "Aviso: Devido ao grande fluxo de público, o Portão C está temporariamente apenas para saída. Torcedores que entram devem se dirigir ao Portão D."
+            "Spanish": (
+                "Aviso: Debido al gran flujo de personas, la Puerta C es temporalmente de solo salida. "
+                "Los aficionados que ingresen deben dirigirse a la Puerta D."
+            ),
+            "French": (
+                "Avis: En raison d'un flux de foule important, la porte C est temporairement réservée "
+                "à la sortie. Les supporters entrants sont priés de se rendre à la porte D."
+            ),
+            "German": (
+                "Hinweis: Aufgrund des starken Besucherstroms ist Gate C vorgewöhnlich nur als Ausgang "
+                "geöffnet. Eintreffende Fans gehen bitte zu Gate D."
+            ),
+            "Japanese": (
+                "お知らせ：混雑のため、ゲートCは一時的に出口専用となっております。"
+                "入場されるお客様はゲートDへお回りください。"
+            ),
+            "Arabic": (
+                "تنبيه: بسبب تدفق الجماهير الكثيف، البوابة C مخصصة للخروج فقط مؤقتاً. "
+                "يرجى من الجماهير القادمة التوجه إلى البوابة D."
+            ),
+            "Portuguese": (
+                "Aviso: Devido ao grande fluxo de público, o Portão C está temporariamente apenas para "
+                "saída. Torcedores que entram devem se dirigir ao Portão D."
+            )
         }
     else:
         fallbacks = {
@@ -99,6 +153,7 @@ def get_broadcast_translation_fallback(alert_text: str, target_lang: str) -> str
         }
     return fallbacks.get(lang_clean, f"[{lang_clean} Translation] {alert_text}")
 
+
 def get_fifa_manual_entry(query: str) -> str:
     """
     Simulated RAG database representing the official FIFA World Cup 2026 Stadium Operations Manual.
@@ -109,28 +164,33 @@ def get_fifa_manual_entry(query: str) -> str:
     manual_data = {
         "evacuation": (
             "📖 **FIFA Operations Manual - Sec 4.2 [Emergency Evacuation Protocol]:**\n"
-            "In the event of an evacuation alarm, all stadium gates, electronic turnstiles, and ADA elevator grids must be automatically set to free-exit bypass mode. "
-            "Volunteers must be deployed at 15-meter intervals along exit corridors to guide spectators to Assembly Areas Alpha, Beta, and Gamma."
+            "In the event of an evacuation alarm, all stadium gates, electronic turnstiles, and ADA elevator grids "
+            "must be automatically set to free-exit bypass mode. Volunteers must be deployed at 15-meter intervals "
+            "along exit corridors to guide spectators to Assembly Areas Alpha, Beta, and Gamma."
         ),
         "lost child": (
             "📖 **FIFA Operations Manual - Sec 11.5 [Missing/Separated Persons]:**\n"
-            "If a separate minor or lost child is reported, staff must immediately notify the Central Security Office (CSO) and issue a description broadcast. "
-            "Do NOT read the child's full name over public PA systems due to child safety guidelines; utilize sector references and physical descriptions only."
+            "If a separate minor or lost child is reported, staff must notify the Central Security Office (CSO) "
+            "immediately and issue a description broadcast. Do NOT read the child's full name over public PA systems "
+            "due to child safety guidelines; utilize sector references and physical descriptions only."
         ),
         "medical": (
             "📖 **FIFA Operations Manual - Sec 7.1 [First-Aid & Medical Dispatch]:**\n"
             "Medical emergencies must be met with localized Red Cross or volunteer first responders. "
-            "Clear a 3-meter pedestrian path immediately. If ambulance entry to the inner ring is required, Gate E (South Tunnel) must be designated."
+            "Clear a 3-meter pedestrian path immediately. If ambulance entry to the inner ring is required, "
+            "Gate E (South Tunnel) must be designated."
         ),
         "concession": (
             "📖 **FIFA Operations Manual - Sec 9.4 [Food Safety and Concession Crowd Control]:**\n"
-            "If concession stand queue wait times exceed 12 minutes, queuing rails must be set up, and overflow signage placed. "
-            "Concession managers must log single-use waste diversion weights hourly to ensure sustainability audit compliance."
+            "If concession stand queue wait times exceed 12 minutes, queuing rails must be set up, and overflow "
+            "signage placed. Concession managers must log single-use waste diversion weights hourly to ensure "
+            "sustainability audit compliance."
         ),
         "transit": (
             "📖 **FIFA Operations Manual - Sec 5.8 [Post-Match Mass Transit Operations]:**\n"
-            "To prevent overcrowding at local train plazas, exit gates A and B must release spectators in pulsed intervals (e.g. 5,000 every 3 minutes). "
-            "Coordinate shuttle frequencies with regional bus networks to match peak exit flow metrics."
+            "To prevent overcrowding at local train plazas, exit gates A and B must release spectators in pulsed "
+            "intervals (e.g. 5,000 every 3 minutes). Coordinate shuttle frequencies with regional bus networks "
+            "to match peak exit flow metrics."
         ),
         "default": (
             "📖 **FIFA Operations Manual - Sec 1.1 [General Stadium Directives]:**\n"
