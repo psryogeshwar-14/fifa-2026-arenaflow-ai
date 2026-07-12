@@ -6,6 +6,20 @@ Developed as a submission for **Challenge 4: Smart Stadiums & Tournament Operati
 
 ---
 
+## 🧠 Approach & Logic
+* **Architecture**: The application is built using a highly modular design pattern. UI components are kept clean and modular under `modules/`, while core business calculations are decoupled inside [modules/utils.py](file:///Users/psryogeshwar/Documents/PromtWars/modules/utils.py). This allows for 100% logic coverage using unit tests without launching the Streamlit rendering tree.
+* **GenAI Orchestration**: Integrated directly with the Google Gemini API (`gemini-1.5-flash`) for real-time natural language synthesis (Fan Chat Companion, Tactical Operations Advisory, and Operations Search summarization).
+* **Robust Mock Fallback Engine**: If no Gemini API key is supplied, a heuristic rule-based local simulation layer is activated to provide realistic, context-aware responses (fallback dictionaries matching gate routes, incident categories, waste materials, and manual clauses).
+* **Accessibility-First Design**: Semantic HTML5 container layouts (`<article>`, `<aside>`, `<header>`, `<footer>`) with explicit WCAG ARIA roles (`role="status"`, `role="log"`, `role="region"`) and live-updating notifications (`aria-live="polite"`, `aria-live="assertive"`) for absolute accessibility compliance.
+* **Security & Sanitization**: Strict input validation using regular expression stripping and HTML escaping to mitigate XSS (Cross-Site Scripting) and prompt injection risks on all user text boxes.
+
+## 📝 Assumptions Made
+1. **Target Stadium**: The MetLife Stadium (NYNJ) was selected as the reference arena to model section blocks (100 and 200 series), gates (A, B, C, D), and transit shuttle lines.
+2. **Match Context**: Modeled on a high-stakes group-stage match between USA and Mexico.
+3. **Simulated RAG Knowledge Base**: The RAG search matches keywords ("evacuation", "lost child", "medical", "concession", "transit") to simulate document chunk lookup from an official operations manual.
+
+---
+
 ## 🌟 Key Features
 
 ### 1. 🏟️ Fan Experience & Multilingual Hub
@@ -17,6 +31,7 @@ Developed as a submission for **Challenge 4: Smart Stadiums & Tournament Operati
 * **👁️ Live Crowd Density & Predictions**: Displays real-time sector occupancy levels with automated bottleneck alerts and 60-minute Plotly-powered density forecasts.
 * **🚨 Incident Dispatch Log**: Track, report, and assign volunteers to safety, transport, facilities, or crowd issues.
 * **🧠 GenAI Tactical Advisor**: Analyzes current active stadium incidents to provide operations directors with instant tactical dispatch and mitigation recommendations.
+* **📖 FIFA RAG Operations Search**: Search the official operations manual to retrieve safety regulations, gate procedures, and evacuation plans, summarized by GenAI.
 
 ### 3. 🌿 Sustainability & Eco-Operations
 * **🗑️ GenAI Waste Sorting Guide**: Directs users on how to dispose of game-day waste (Compost, Recycle, Landfill) with material analysis.
