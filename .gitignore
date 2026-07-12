@@ -4,3 +4,6 @@ __pycache__/
 .streamlit/
 .env
 .DS_Store
+.coverage
+.pytest_cache/
+htmlcov/
