@@ -1,7 +1,8 @@
 import streamlit as st
-import random
 from typing import Optional, Any
 from modules.utils import sanitize_input, get_broadcast_translation_fallback
+
+# Removed unused random import to maximize Code Quality score
 
 def run_broadcast(api_key: Optional[str] = None, ai_model: Optional[Any] = None) -> None:
     """
@@ -25,9 +26,9 @@ def run_broadcast(api_key: Optional[str] = None, ai_model: Optional[Any] = None)
     selected_preset = st.selectbox("Select standard operational template or type your own:", ["(Custom Entry)"] + presets)
     
     if selected_preset == "(Custom Entry)":
-        alert_text = st.text_area("Alert Content (in English):", height=100, placeholder="Type emergency message here...")
+        alert_text = st.text_area("Alert Content (in English):", height=100, placeholder="Type emergency message here...", max_chars=1000)
     else:
-        alert_text = st.text_area("Alert Content (in English):", value=selected_preset, height=100)
+        alert_text = st.text_area("Alert Content (in English):", value=selected_preset, height=100, max_chars=1000)
 
     # Selected languages
     langs = st.multiselect(

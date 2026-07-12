@@ -83,7 +83,7 @@ def get_broadcast_translation_fallback(alert_text: str, target_lang: str) -> str
         fallbacks = {
             "Spanish": "Aviso: Debido al gran flujo de personas, la Puerta C es temporalmente de solo salida. Los aficionados que ingresen deben dirigirse a la Puerta D.",
             "French": "Avis: En raison d'un flux de foule important, la porte C est temporairement réservée à la sortie. Les supporters entrants sont priés de se rendre à la porte D.",
-            "German": "Hinweis: Aufgrund des starken Besucherstroms ist Gate C vorübergehend nur als Ausgang geöffnet. Eintreffende Fans gehen bitte zu Gate D.",
+            "German": "Hinweis: Aufgrund des starken Besucherstroms ist Gate C vorgewöhnlich nur als Ausgang geöffnet. Eintreffende Fans gehen bitte zu Gate D.",
             "Japanese": "お知らせ：混雑のため、ゲートCは一時的に出口専用となっております。入場されるお客様はゲートDへお回りください。",
             "Arabic": "تنبيه: بسبب تدفق الجماهير الكثيف، البوابة C مخصصة للخروج فقط مؤقتاً. يرجى من الجماهير القادمة التوجه إلى البوابة D.",
             "Portuguese": "Aviso: Devido ao grande fluxo de público, o Portão C está temporariamente apenas para saída. Torcedores que entram devem se dirigir ao Portão D."
@@ -98,3 +98,50 @@ def get_broadcast_translation_fallback(alert_text: str, target_lang: str) -> str
             "Portuguese": f"[Tradução para o Português] {alert_text} (Traduzido por IA)"
         }
     return fallbacks.get(lang_clean, f"[{lang_clean} Translation] {alert_text}")
+
+def get_fifa_manual_entry(query: str) -> str:
+    """
+    Simulated RAG database representing the official FIFA World Cup 2026 Stadium Operations Manual.
+    Matches query keywords and returns operational clauses.
+    """
+    clean_query = query.lower()
+    
+    manual_data = {
+        "evacuation": (
+            "📖 **FIFA Operations Manual - Sec 4.2 [Emergency Evacuation Protocol]:**\n"
+            "In the event of an evacuation alarm, all stadium gates, electronic turnstiles, and ADA elevator grids must be automatically set to free-exit bypass mode. "
+            "Volunteers must be deployed at 15-meter intervals along exit corridors to guide spectators to Assembly Areas Alpha, Beta, and Gamma."
+        ),
+        "lost child": (
+            "📖 **FIFA Operations Manual - Sec 11.5 [Missing/Separated Persons]:**\n"
+            "If a separate minor or lost child is reported, staff must immediately notify the Central Security Office (CSO) and issue a description broadcast. "
+            "Do NOT read the child's full name over public PA systems due to child safety guidelines; utilize sector references and physical descriptions only."
+        ),
+        "medical": (
+            "📖 **FIFA Operations Manual - Sec 7.1 [First-Aid & Medical Dispatch]:**\n"
+            "Medical emergencies must be met with localized Red Cross or volunteer first responders. "
+            "Clear a 3-meter pedestrian path immediately. If ambulance entry to the inner ring is required, Gate E (South Tunnel) must be designated."
+        ),
+        "concession": (
+            "📖 **FIFA Operations Manual - Sec 9.4 [Food Safety and Concession Crowd Control]:**\n"
+            "If concession stand queue wait times exceed 12 minutes, queuing rails must be set up, and overflow signage placed. "
+            "Concession managers must log single-use waste diversion weights hourly to ensure sustainability audit compliance."
+        ),
+        "transit": (
+            "📖 **FIFA Operations Manual - Sec 5.8 [Post-Match Mass Transit Operations]:**\n"
+            "To prevent overcrowding at local train plazas, exit gates A and B must release spectators in pulsed intervals (e.g. 5,000 every 3 minutes). "
+            "Coordinate shuttle frequencies with regional bus networks to match peak exit flow metrics."
+        ),
+        "default": (
+            "📖 **FIFA Operations Manual - Sec 1.1 [General Stadium Directives]:**\n"
+            "All stadium staff and volunteer teams must maintain clear visual badges. "
+            "Multilingual guides should be placed at all information kiosks to assist global visitors."
+        )
+    }
+    
+    # Match keywords
+    for key, text in manual_data.items():
+        if key in clean_query:
+            return text
+            
+    return manual_data["default"]

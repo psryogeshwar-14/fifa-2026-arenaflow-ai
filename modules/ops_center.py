@@ -5,13 +5,13 @@ import plotly.express as px
 import random
 from datetime import datetime, timedelta
 from typing import Optional, Any
-from modules.utils import sanitize_input
+from modules.utils import sanitize_input, get_fifa_manual_entry
 
 def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None) -> None:
     """
     Renders the Operations and Crowd Command Center dashboard page.
-    Includes full sanitization of incident logging to prevent XSS/prompt injections,
-    as well as strict WCAG visual annotations for high accessibility.
+    Includes input sanitization, automated incident logging, GenAI advisory,
+    and a RAG-based search tool of FIFA guidelines for stadium operations.
     """
     st.markdown("## 📊 Operations & Crowd Command Center")
     st.markdown("Real-time crowd flow analysis, incident response systems, and GenAI-powered decision support for venue staff.")
@@ -30,7 +30,12 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
         ]
 
     # Sub-tabs
-    tab1, tab2, tab3 = st.tabs(["👁️ Real-time Crowd Flow", "🚨 Incident Dispatch Log", "🧠 GenAI Operational Advice"])
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "👁️ Real-time Crowd Flow", 
+        "🚨 Incident Dispatch Log", 
+        "🧠 GenAI Tactical Advice",
+        "📖 FIFA RAG Operations Search"
+    ])
 
     with tab1:
         st.subheader("👁️ Live Crowd Density & Predictions")
@@ -176,7 +181,7 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
                 new_sector = st.selectbox("Sector", ["Gate A Entrance", "Gate B Entrance", "Gate C Concourse", "Section 108 Corridor", "Transit Station Plaza", "Food Court West"])
                 new_cat = st.selectbox("Category", ["Safety", "Crowd", "Accessibility", "Transport", "Facilities"])
                 new_urg = st.selectbox("Urgency", ["Low", "Medium", "High"])
-                new_desc = st.text_area("Description / Details")
+                new_desc = st.text_area("Description / Details", max_chars=1000)
                 
                 submit_inc = st.form_submit_button("Submit Report")
                 if submit_inc:
@@ -278,6 +283,49 @@ def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None
                     <aside class="details-panel" role="region" aria-label="Tactical Action Plan" style="margin-top: 1rem;">
                         <div style="font-weight: bold; font-size: 1.1rem; color: #3b82f6; margin-bottom: 0.75rem;">📋 Tactical Action Plan</div>
                         <div style="font-size: 0.95rem; line-height: 1.6; color: #e4e4e7;">{advice}</div>
+                    </aside>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+    with tab4:
+        st.subheader("📖 FIFA RAG Operations Search")
+        st.write("Search the official simulated FIFA World Cup 2026 Operations manual to retrieve exact safety and crowd guidelines via GenAI.")
+        
+        search_query = st.text_input("Enter search keywords (e.g. 'evacuation', 'lost child', 'medical', 'transit'):", max_chars=200)
+        
+        if search_query:
+            sanitized_search = sanitize_input(search_query)
+            with st.spinner("Searching operations guidelines manual..."):
+                # Retrieve matching entry from business logic database
+                manual_clause = get_fifa_manual_entry(sanitized_search)
+                
+                summary = ""
+                if api_key and ai_model:
+                    try:
+                        prompt = (
+                            "You are a FIFA Operations Manual Assistant. Given this official guidebook clause:\n"
+                            f"{manual_clause}\n"
+                            "Provide a friendly, highly actionable 2-sentence summary/checklist for venue stewards. Be direct."
+                        )
+                        res = ai_model.generate_content(prompt)
+                        summary = res.text
+                    except Exception as e:
+                        summary = f"⚠️ GenAI Assistant Error: {sanitize_input(str(e))}"
+                
+                if not summary or summary.startswith("⚠️"):
+                    summary = (
+                        "👉 **Action Item Checklist:** Follow safety directives, set local barriers or exit override modes immediately, "
+                        "and notify Central security via your mobile terminal."
+                    )
+                
+                st.markdown(
+                    f"""
+                    <aside class="details-panel" role="region" aria-label="FIFA Operations Manual Guidelines" style="margin-top: 1rem; border-left: 4px solid #fbbf24 !important;">
+                        <div style="font-weight: bold; font-size: 1.05rem; color: #fbbf24; margin-bottom: 0.5rem;">📖 Retrieved Manual Regulation</div>
+                        <div style="font-size: 0.95rem; color: #e4e4e7; line-height: 1.6; margin-bottom: 1rem;">{manual_clause}</div>
+                        <div style="font-weight: bold; font-size: 0.95rem; color: #34d399; margin-bottom: 0.25rem;">📌 Steward Directives:</div>
+                        <div style="font-size: 0.9rem; color: #d4d4d8; line-height: 1.5;">{summary}</div>
                     </aside>
                     """,
                     unsafe_allow_html=True
