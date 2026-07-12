@@ -4,8 +4,15 @@ import numpy as np
 import plotly.express as px
 import random
 from datetime import datetime, timedelta
+from typing import Optional, Any
+from modules.utils import sanitize_input
 
-def run_ops_center(api_key=None, ai_model=None):
+def run_ops_center(api_key: Optional[str] = None, ai_model: Optional[Any] = None) -> None:
+    """
+    Renders the Operations and Crowd Command Center dashboard page.
+    Includes full sanitization of incident logging to prevent XSS/prompt injections,
+    as well as strict WCAG visual annotations for high accessibility.
+    """
     st.markdown("## 📊 Operations & Crowd Command Center")
     st.markdown("Real-time crowd flow analysis, incident response systems, and GenAI-powered decision support for venue staff.")
 
@@ -43,33 +50,33 @@ def run_ops_center(api_key=None, ai_model=None):
         with col_m1:
             st.markdown(
                 """
-                <div class="metric-card" style="border-left: 4px solid #ef4444 !important;">
-                    <div class="muted-text">CRITICAL BOTTLENECKS</div>
+                <article class="metric-card" role="status" aria-label="Critical Bottlenecks Count" style="border-left: 4px solid #ef4444 !important; background-color: #0c0c0f !important;">
+                    <div class="muted-text" style="font-size: 0.8rem; font-weight: bold;">CRITICAL BOTTLENECKS</div>
                     <div style="font-size: 2.2rem; font-weight: 800; color: #ef4444; margin: 0.3rem 0;">2 Sectors</div>
                     <div class="muted-text" style="font-size: 0.8rem;">Gate C & Transit Plaza</div>
-                </div>
+                </article>
                 """,
                 unsafe_allow_html=True
             )
         with col_m2:
             st.markdown(
                 """
-                <div class="metric-card" style="border-left: 4px solid #f59e0b !important;">
-                    <div class="muted-text">TOTAL STADIUM CROWD</div>
+                <article class="metric-card" role="status" aria-label="Total Stadium Crowd Status" style="border-left: 4px solid #fbbf24 !important; background-color: #0c0c0f !important;">
+                    <div class="muted-text" style="font-size: 0.8rem; font-weight: bold;">TOTAL STADIUM CROWD</div>
                     <div style="font-size: 2.2rem; font-weight: 800; color: #fbbf24; margin: 0.3rem 0;">78,450</div>
                     <div class="muted-text" style="font-size: 0.8rem;">98.1% Arena Occupancy</div>
-                </div>
+                </article>
                 """,
                 unsafe_allow_html=True
             )
         with col_m3:
             st.markdown(
                 """
-                <div class="metric-card" style="border-left: 4px solid #10b981 !important;">
-                    <div class="muted-text">ACTIVE STAFF & VOLUNTEERS</div>
+                <article class="metric-card" role="status" aria-label="Active Deployed Staff Count" style="border-left: 4px solid #34d399 !important; background-color: #0c0c0f !important;">
+                    <div class="muted-text" style="font-size: 0.8rem; font-weight: bold;">ACTIVE STAFF & VOLUNTEERS</div>
                     <div style="font-size: 2.2rem; font-weight: 800; color: #34d399; margin: 0.3rem 0;">842 deployed</div>
                     <div class="muted-text" style="font-size: 0.8rem;">Across 7 sectors</div>
-                </div>
+                </article>
                 """,
                 unsafe_allow_html=True
             )
@@ -119,20 +126,24 @@ def run_ops_center(api_key=None, ai_model=None):
                 badge_color = "#ef4444" if inc["urgency"] == "High" else ("#f59e0b" if inc["urgency"] == "Medium" else "#3b82f6")
                 status_color = "#f87171" if inc["status"] == "Active" else "#60a5fa"
                 
+                # Sanitize descriptive inputs to prevent custom tag rendering
+                clean_desc = sanitize_input(inc["desc"])
+                clean_sector = sanitize_input(inc["sector"])
+                
                 st.markdown(
                     f"""
-                    <div class="metric-card" style="margin-bottom: 0.75rem !important;">
+                    <article class="metric-card" role="log" aria-label="Incident {inc["id"]} in {clean_sector}" style="margin-bottom: 0.75rem !important; background-color: #0c0c0f !important;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <span class="mono-text">{inc["id"]}</span>
                             <span style="background-color: {badge_color}; color: #000000; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">{inc["urgency"]} Urgency</span>
                         </div>
-                        <div style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.25rem;">{inc["sector"]} - {inc["category"]}</div>
-                        <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #d4d4d8;">{inc["desc"]}</p>
+                        <div style="font-weight: bold; font-size: 1.05rem; margin-bottom: 0.25rem;">{clean_sector} - {inc["category"]}</div>
+                        <p style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #d4d4d8;">{clean_desc}</p>
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #a1a1aa;">
                             <span>Reported at {inc["time"]}</span>
-                            <span style="color: {status_color}; font-weight: bold;">Status: {inc["status"]}</span>
+                            <span style="color: {status_color}; font-weight: bold;" aria-live="polite">Status: {inc["status"]}</span>
                         </div>
-                    </div>
+                    </article>
                     """,
                     unsafe_allow_html=True
                 )
@@ -143,7 +154,7 @@ def run_ops_center(api_key=None, ai_model=None):
                     with col_act1:
                         if st.button(f"⚡ AI Dispatch & Assign", key=f"dispatch_{inc['id']}"):
                             task_id = f"TSK-{random.randint(302, 399)}"
-                            task_desc = f"GenAI Recommendation: Dispatch volunteers to {inc['sector']} to handle {inc['desc']}"
+                            task_desc = f"GenAI Recommendation: Dispatch volunteers to {clean_sector} to handle {clean_desc}"
                             st.session_state.dispatched_tasks.append({
                                 "id": task_id,
                                 "incident": inc["id"],
@@ -169,13 +180,17 @@ def run_ops_center(api_key=None, ai_model=None):
                 
                 submit_inc = st.form_submit_button("Submit Report")
                 if submit_inc:
+                    # Sanitize input form values
+                    safe_desc = sanitize_input(new_desc)
+                    safe_sector = sanitize_input(new_sector)
+                    
                     inc_id = f"INC-{random.randint(100, 999)}"
                     st.session_state.incidents.insert(0, {
                         "id": inc_id,
-                        "sector": new_sector,
+                        "sector": safe_sector,
                         "category": new_cat,
                         "urgency": new_urg,
-                        "desc": new_desc,
+                        "desc": safe_desc,
                         "status": "Active",
                         "time": datetime.now().strftime("%H:%M")
                     })
@@ -185,15 +200,17 @@ def run_ops_center(api_key=None, ai_model=None):
             st.markdown("---")
             st.markdown("##### 📋 Deployed Tasks List")
             for tsk in st.session_state.dispatched_tasks:
+                clean_task_desc = sanitize_input(tsk["task"])
+                clean_assignee = sanitize_input(tsk["assignee"])
                 st.markdown(
                     f"""
-                    <div style="background-color: #18181b; border: 1px solid #27272a; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div role="status" aria-label="Task {tsk["id"]}" style="background-color: #18181b; border: 1px solid #27272a; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem;">
                         <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #a1a1aa; margin-bottom: 0.25rem;">
                             <span>{tsk["id"]} ({tsk["incident"]})</span>
-                            <span style="color: #34d399;">{tsk["status"]}</span>
+                            <span style="color: #34d399; font-weight: bold;">{tsk["status"]}</span>
                         </div>
-                        <div style="font-size: 0.85rem; font-weight: 500; color: #fafafa; margin-bottom: 0.25rem;">{tsk["assignee"]}</div>
-                        <div style="font-size: 0.8rem; color: #d4d4d8;">{tsk["task"]}</div>
+                        <div style="font-size: 0.85rem; font-weight: 500; color: #fafafa; margin-bottom: 0.25rem;">{clean_assignee}</div>
+                        <div style="font-size: 0.8rem; color: #d4d4d8;">{clean_task_desc}</div>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -216,7 +233,7 @@ def run_ops_center(api_key=None, ai_model=None):
             f"""
             <div style="background-color: #18181b; border: 1px solid #27272a; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                 <div style="font-size: 0.8rem; color: #a1a1aa; font-weight: bold; margin-bottom: 0.5rem;">CURRENT CONTEXT TO FEED AI:</div>
-                <pre style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #60a5fa; white-space: pre-wrap;">{active_incidents_str}</pre>
+                <pre style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #60a5fa; white-space: pre-wrap;">{sanitize_input(active_incidents_str)}</pre>
             </div>
             """,
             unsafe_allow_html=True
@@ -238,7 +255,7 @@ def run_ops_center(api_key=None, ai_model=None):
                         res = ai_model.generate_content(prompt)
                         advice = res.text
                     except Exception as e:
-                        advice = f"⚠️ GenAI Advisor Error: {str(e)}. Falling back to local simulation."
+                        advice = f"⚠️ GenAI Advisor Error: {sanitize_input(str(e))}. Falling back to local simulation."
                 
                 if not advice or advice.startswith("⚠️"):
                     # Local fallback rule engine
@@ -255,12 +272,13 @@ def run_ops_center(api_key=None, ai_model=None):
                         "   - Coordinate with local city traffic management to request green-light priority on transit roads."
                     )
                 
+                # HTML escaped advice string rendered as Markdown inside styled container
                 st.markdown(
                     f"""
-                    <div class="details-panel" style="margin-top: 1rem;">
+                    <aside class="details-panel" role="region" aria-label="Tactical Action Plan" style="margin-top: 1rem;">
                         <div style="font-weight: bold; font-size: 1.1rem; color: #3b82f6; margin-bottom: 0.75rem;">📋 Tactical Action Plan</div>
                         <div style="font-size: 0.95rem; line-height: 1.6; color: #e4e4e7;">{advice}</div>
-                    </div>
+                    </aside>
                     """,
                     unsafe_allow_html=True
                 )

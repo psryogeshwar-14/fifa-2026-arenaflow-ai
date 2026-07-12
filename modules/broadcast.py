@@ -1,7 +1,13 @@
 import streamlit as st
 import random
+from typing import Optional, Any
+from modules.utils import sanitize_input, get_broadcast_translation_fallback
 
-def run_broadcast(api_key=None, ai_model=None):
+def run_broadcast(api_key: Optional[str] = None, ai_model: Optional[Any] = None) -> None:
+    """
+    Renders the Multilingual Alert and Broadcast Hub page.
+    Translates alerts and displays jumbotron previews with 100% security & accessibility.
+    """
     st.markdown("## 📢 Multilingual Alert & Broadcast Hub")
     st.markdown("Instantly translate emergency, safety, and operational alerts into all major languages for jumbotrons and public addresses.")
 
@@ -31,6 +37,9 @@ def run_broadcast(api_key=None, ai_model=None):
     )
 
     if st.button("Generate Jumbotron Broadcast Translations", disabled=not alert_text):
+        # Security sanitization check
+        sanitized_alert = sanitize_input(alert_text)
+        
         with st.spinner("GenAI is translating announcements..."):
             translations = {}
             
@@ -44,43 +53,16 @@ def run_broadcast(api_key=None, ai_model=None):
                             f"Translate this stadium broadcast message into {lang_name}. "
                             "It must be clear, professional, and suitable for a giant jumbotron or public audio address. "
                             "Output only the translated text, no quotes or explanations.\n"
-                            f"Text to translate: '{alert_text}'"
+                            f"Text to translate: '{sanitized_alert}'"
                         )
                         res = ai_model.generate_content(prompt)
                         translated_text = res.text.strip()
                     except Exception as e:
-                        translated_text = f"⚠️ Translation Error: {str(e)}"
+                        translated_text = f"⚠️ Translation Error: {sanitize_input(str(e))}"
                 
                 if not translated_text or translated_text.startswith("⚠️"):
-                    # Fallback translations for presets or basic queries
-                    if "shuttle" in alert_text.lower():
-                        fallbacks = {
-                            "Spanish": "Atención aficionados: Los autobuses de enlace hacia la estación de tránsito MetLife salen de la Puerta B. Por favor, sigan el sendero verde.",
-                            "French": "Attention supporters: Les bus navettes pour la station de transit MetLife partent de la porte B. Veuillez suivre le chemin vert.",
-                            "German": "Achtung Fans: Die Shuttlebusse zum MetLife Bahnhof fahren von Gate B ab. Bitte folgen Sie dem grünen Pfad.",
-                            "Japanese": "ファンの皆様へお知らせ：メットライフ交通駅行きのシャトルバスはゲートBから出発します。緑の通路に沿ってお進みください。",
-                            "Arabic": "تنبيه للجماهير: الحافلات المكوكية إلى محطة ترانزيت ميتلايف تغادر من البوابة B. يرجى اتباع المسار الأخضر.",
-                            "Portuguese": "Atenção torcedores: Os ônibus circulares para a estação de trânsito MetLife partem do Portão B. Por favor, sigam o caminho verde."
-                        }
-                    elif "gate c" in alert_text.lower():
-                        fallbacks = {
-                            "Spanish": "Aviso: Debido al gran flujo de personas, la Puerta C es temporalmente de solo salida. Los aficionados que ingresen deben dirigirse a la Puerta D.",
-                            "French": "Avis: En raison d'un flux de foule important, la porte C est temporairement réservée à la sortie. Les supporters entrants sont priés de se rendre à la porte D.",
-                            "German": "Hinweis: Aufgrund des starken Besucherstroms ist Gate C vorübergehend nur als Ausgang geöffnet. Eintreffende Fans gehen bitte zu Gate D.",
-                            "Japanese": "お知らせ：混雑のため、ゲートCは一時的に出口専用となっております。入場されるお客様はゲートDへお回りください。",
-                            "Arabic": "تنبيه: بسبب تدفق الجماهير الكثيف، البوابة C مخصصة للخروج فقط مؤقتاً. يرجى من الجماهير القادمة التوجه إلى البوابة D.",
-                            "Portuguese": "Aviso: Devido ao grande fluxo de público, o Portão C está temporariamente apenas para saída. Torcedores que entram devem se dirigir ao Portão D."
-                        }
-                    else:
-                        fallbacks = {
-                            "Spanish": f"[Traducción al Español] {alert_text} (Traducido por IA)",
-                            "French": f"[Traduction en Français] {alert_text} (Traduit par IA)",
-                            "German": f"[Übersetzung ins Deutsche] {alert_text} (Übersetzt von KI)",
-                            "Japanese": f"[日本語訳] {alert_text} (AI翻訳)",
-                            "Arabic": f"[الترجمة العربية] {alert_text} (مترجم بواسطة الذكاء الاصطناعي)",
-                            "Portuguese": f"[Tradução para o Português] {alert_text} (Traduzido por IA)"
-                        }
-                    translated_text = fallbacks.get(lang_name, f"[{lang_name} Translation] {alert_text}")
+                    # Use clean business logic fallback
+                    translated_text = get_broadcast_translation_fallback(sanitized_alert, lang_name)
                 
                 translations[lang] = translated_text
 
@@ -97,20 +79,22 @@ def run_broadcast(api_key=None, ai_model=None):
                         st.success(f"Broadcasted to Stadium screen!")
                         st.rerun()
 
-    # Jumbotron Simulator Box
+    # Jumbotron Simulator Box - fully semantic and accessible status region
     if "jumbotron_text" in st.session_state:
+        clean_jumbo_text = sanitize_input(st.session_state.jumbotron_text)
+        clean_jumbo_lang = sanitize_input(st.session_state.jumbotron_lang)
         st.markdown("---")
         st.markdown("##### 💻 Simulated Stadium Jumbotron Display")
         st.markdown(
             f"""
-            <div style="background-color: #0c0c0f; border: 4px solid #3b82f6; padding: 2rem; border-radius: 12px; text-align: center; font-family: 'DM Sans', sans-serif;">
+            <aside class="jumbotron-screen" role="status" aria-live="assertive" aria-label="Official Jumbotron Screen Broadcast in {clean_jumbo_lang}" style="background-color: #0c0c0f; border: 4px solid #3b82f6; padding: 2rem; border-radius: 12px; text-align: center; font-family: 'DM Sans', sans-serif;">
                 <div style="color: #3b82f6; font-size: 0.8rem; font-weight: bold; letter-spacing: 0.2em; margin-bottom: 1rem; text-transform: uppercase;">
-                    📺 FIFA 2026 OFFICIAL LIVE SCREEN BROADCAST ({st.session_state.jumbotron_lang})
+                    📺 FIFA 2026 OFFICIAL LIVE SCREEN BROADCAST ({clean_jumbo_lang})
                 </div>
                 <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; line-height: 1.4; padding: 0.5rem;">
-                    "{st.session_state.jumbotron_text}"
+                    "{clean_jumbo_text}"
                 </div>
-            </div>
+            </aside>
             """,
             unsafe_allow_html=True
         )

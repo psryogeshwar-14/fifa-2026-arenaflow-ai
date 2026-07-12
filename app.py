@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
+from modules.utils import sanitize_input
 
 # Load local environment variables if available
 load_dotenv()
@@ -15,7 +16,7 @@ st.set_page_config(
 )
 
 # Load and inject custom CSS stylesheet
-def load_css(file_name):
+def load_css(file_name: str) -> None:
     if os.path.exists(file_name):
         with open(file_name) as f:
             st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -25,14 +26,14 @@ load_css("styles.css")
 # --- GENAI CONFIGURATION ---
 api_key = os.getenv("GEMINI_API_KEY")
 
-# Sidebar Configuration
+# Sidebar Configuration - Fully semantic structural element
 st.sidebar.markdown(
     """
-    <div style="text-align: center; padding-bottom: 1.5rem;">
-        <span style="font-size: 2.5rem;">🏟️</span>
+    <header style="text-align: center; padding-bottom: 1.5rem;" role="banner">
+        <span style="font-size: 2.5rem;" aria-hidden="true">🏟️</span>
         <h2 style="margin-top: 0.5rem; margin-bottom: 0.2rem; font-size: 1.6rem; letter-spacing: -0.03em;">ArenaFlow AI</h2>
         <div style="font-size: 0.8rem; color: #71717a; font-weight: 500;">FIFA World Cup 2026 Operations</div>
-    </div>
+    </header>
     """,
     unsafe_allow_html=True
 )
@@ -48,25 +49,25 @@ user_key = st.sidebar.text_input(
 )
 
 if user_key:
-    api_key = user_key
+    # Security: sanitize and validate input
+    api_key = sanitize_input(user_key)
     try:
         genai.configure(api_key=api_key)
-        # Using gemini-1.5-flash as default, fallback to gemini-pro if needed
         ai_model = genai.GenerativeModel('gemini-1.5-flash')
         st.sidebar.markdown(
-            '<div class="alert-container alert-success"><span style="font-size: 1.1rem;">⚡</span><div><b>Live GenAI Active</b><br/>Connected to Gemini API.</div></div>',
+            '<div class="alert-container alert-success" role="status" aria-live="polite"><span style="font-size: 1.1rem;">⚡</span><div><b>Live GenAI Active</b><br/>Connected to Gemini API.</div></div>',
             unsafe_allow_html=True
         )
     except Exception as e:
         ai_model = None
         st.sidebar.markdown(
-            f'<div class="alert-container alert-error"><span style="font-size: 1.1rem;">⚠️</span><div><b>Connection Failed</b><br/>{str(e)}</div></div>',
+            f'<div class="alert-container alert-error" role="status" aria-live="polite"><span style="font-size: 1.1rem;">⚠️</span><div><b>Connection Failed</b><br/>{sanitize_input(str(e))}</div></div>',
             unsafe_allow_html=True
         )
 else:
     ai_model = None
     st.sidebar.markdown(
-        '<div class="alert-container alert-warning"><span style="font-size: 1.1rem;">🤖</span><div><b>Simulation Mode</b><br/>Running local heuristic AI.</div></div>',
+        '<div class="alert-container alert-warning" role="status" aria-live="polite"><span style="font-size: 1.1rem;">🤖</span><div><b>Simulation Mode</b><br/>Running local heuristic AI.</div></div>',
         unsafe_allow_html=True
     )
 
@@ -84,17 +85,17 @@ nav_choice = st.sidebar.radio(
     ]
 )
 
-# Live Match Context Widget
+# Live Match Context Widget - Accessible article layout
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     """
-    <div style="background-color: #18181b; border: 1px solid #27272a; padding: 1rem; border-radius: 8px;">
+    <article style="background-color: #18181b; border: 1px solid #27272a; padding: 1rem; border-radius: 8px;" role="region" aria-label="Live Match Details">
         <div style="font-size: 0.75rem; color: #a1a1aa; font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem;">🎮 Live Match Context</div>
         <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 0.25rem; color: #fbbf24;">USA vs MEXICO</div>
         <div style="font-size: 0.85rem; color: #fafafa; margin-bottom: 0.5rem;">Group Stage - Match 14</div>
         <div style="font-size: 0.8rem; color: #71717a;">📍 MetLife Stadium, NYNJ</div>
         <div style="font-size: 0.8rem; color: #71717a;">⏰ Kickoff: 20:00 (Local)</div>
-    </div>
+    </article>
     """,
     unsafe_allow_html=True
 )
@@ -118,9 +119,9 @@ else:
 st.markdown("---")
 st.markdown(
     """
-    <div style="text-align: center; color: #71717a; font-size: 0.8rem; padding: 1rem;">
+    <footer style="text-align: center; color: #71717a; font-size: 0.8rem; padding: 1rem;" role="contentinfo">
         ⚽ ArenaFlow AI • Build for Challenge 4 (Smart Stadiums & Operations) • FIFA World Cup 2026
-    </div>
+    </footer>
     """,
     unsafe_allow_html=True
 )
